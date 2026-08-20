@@ -1,0 +1,10 @@
+**/.idea/
+**/.bloop/
+**/.bsp/
+**/.metals/
+**/out/
+**/target/
+*.class
+*.iml
+*.jar
+.DS_Store

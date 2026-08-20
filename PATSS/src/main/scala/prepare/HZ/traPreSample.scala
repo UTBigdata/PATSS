@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions.concat_ws
 import org.apache.spark.sql.types.StringType
-import ours_LCPS.tool.{log, sparkInitial}
+import patss.lcps.tool.{log, sparkInitial}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -13,14 +13,16 @@ object traPreSample {
 
     new log().level()
 
-    val hdfs = args.head
-    val master = args.last
+    require(args.length == 3, "Usage: prepare.HZ.traPreSample <input-csv-path> <output-root> <spark-master>")
+    val inputPath = args(0)
+    val outputRoot = args(1).stripSuffix("/")
+    val master = args(2)
     val spark = new sparkInitial().start("384","pre","192",master)
 
     import spark.implicits._
 
     val hz = spark.read.format("csv").option("header", value = true).
-      load(s"hdfs://10.103.108.7:9000/HZ").// /HZ
+      load(inputPath).
       select("userID", "status","time", "lineID", "stationID", "payType").
       filter($"payType"=!=3).drop($"payType").na.drop().filter {x=>
         val con =  new ArrayBuffer[Boolean]()
@@ -70,13 +72,13 @@ object traPreSample {
 
 //    hz2.count() //613569
     val staTraOri1 = hz2.map(x => x(0) + "\t" + x(1))
-    staTraOri1.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-100")
+    staTraOri1.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-100")
     val raw25 = staTraOri1.sample(withReplacement = false, 0.25).repartition(192)
-    raw25.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-25")
+    raw25.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-25")
     val raw50 = staTraOri1.sample(withReplacement = false, 0.5).repartition(192)
-    raw50.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-50")
+    raw50.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-50")
     val raw75 = staTraOri1.sample(withReplacement = false, 0.75).repartition(192)
-    raw75.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-75")
+    raw75.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-75")
 
     //mini sample
     val staTraOri0mini = hz1.rdd.
@@ -86,13 +88,13 @@ object traPreSample {
       filter(t => t(1).asInstanceOf[String].split(",").length > 21 && t(1).asInstanceOf[String].split(",").length < 23)
     val staTraOri1mini = staTraOri0mini.map(x => x(0) + "\t" + x(1))
 
-    staTraOri1mini.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-mini-100")
+    staTraOri1mini.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-mini-100")
     val raw25mini = staTraOri1mini.sample(withReplacement = false, 0.25).repartition(192)
-    raw25mini.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-mini-25")
+    raw25mini.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-mini-25")
     val raw50mini = staTraOri1mini.sample(withReplacement = false, 0.5).repartition(192)
-    raw50mini.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-mini-50")
+    raw50mini.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-mini-50")
     val raw75mini = staTraOri1mini.sample(withReplacement = false, 0.75).repartition(192)
-    raw75mini.saveAsTextFile(s"$hdfs/ours/HZ/all/HZ-2019Jan-mini-75")
+    raw75mini.saveAsTextFile(s"$outputRoot/patss/HZ/all/HZ-2019Jan-mini-75")
 
   }
 }

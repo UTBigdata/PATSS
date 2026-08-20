@@ -1,6 +1,6 @@
 # PATSS
 
-PATSS (pattern-aware distributed trajectory similarity search and join for large-scale metro systems) is a Scala/Spark framework for similarity search and join over metro passenger trajectories. This repository contains the implementation accompanying the PATSS manuscript.
+PATSS is a Scala/Spark framework for similarity search and join over metro passenger trajectories.
 
 ## Source layout
 
@@ -86,4 +86,4 @@ No raw data or passenger identifiers are included in this repository.
 
 ## Citation
 
-Please cite the associated PATSS manuscript. Publication details will be added after publication.
+Please cite the associated PATSS manuscript or this repository. Publication details will be added after publication.
